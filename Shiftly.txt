@@ -1,0 +1,1883 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shiftly - Overtime & Payroll Tracker</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #F4F7F5;
+            --card-bg: #FFFFFF;
+            --primary: #4A7C59; /* Sage Green */
+            --primary-light: #E8F0EA;
+            --accent: #D08C60; 
+            --text-main: #2D3732;
+            --text-muted: #707A74;
+            --border-color: #E2E8E4;
+            --error-color: #E53E3E;
+            --shadow: 0 10px 25px -5px rgba(74, 124, 89, 0.08), 0 8px 10px -6px rgba(74, 124, 89, 0.04);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            box-sizing: border-box;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            display: flex;
+            flex-direction: column;
+            min-height: 650px;
+        }
+
+        #setup-screen {
+            text-align: center;
+            margin: auto 0;
+        }
+
+        .setup-logo {
+            font-size: 48px;
+            margin-bottom: 8px;
+        }
+
+        .setup-title {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .setup-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        #main-app {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            background: var(--bg-color);
+            padding: 10px 14px;
+            border-radius: 14px;
+        }
+
+        .welcome-user {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .lang-switcher-inline select {
+            padding: 6px 10px;
+            font-size: 11px;
+            border-radius: 8px;
+            background: #fff;
+            width: auto;
+        }
+
+        .app-title-area {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin: 0 0 4px 0;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .tabs {
+            display: flex;
+            background: var(--bg-color);
+            padding: 4px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            gap: 2px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 4px;
+            border: none;
+            background: transparent;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .tab-btn.active {
+            background: var(--card-bg);
+            color: var(--primary);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .tab-content {
+            display: none;
+            flex: 1;
+        }
+
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .tab-body-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-main);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 14px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 14px;
+            color: var(--text-main);
+            box-sizing: border-box;
+            transition: all 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: #fff;
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        input.error-input, select.error-input, textarea.error-input {
+            border-color: var(--error-color) !important;
+            background-color: #FFF5F5 !important;
+        }
+
+        .btn-main {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-main:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background-color: #E2E8E4;
+            color: var(--text-main);
+        }
+
+        .btn-wa {
+            background-color: #25D366;
+            color: white;
+        }
+
+        .btn-ig {
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            color: white;
+        }
+
+        .result-box {
+            margin-top: 20px;
+            background: var(--primary-light);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px dashed var(--primary);
+        }
+
+        .result-box h3 {
+            margin: 0 0 12px 0;
+            font-size: 15px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+        }
+
+        .result-row strong {
+            color: var(--text-main);
+        }
+
+        .result-divider {
+            border: 0;
+            border-top: 1px solid #d0dfd4;
+            margin: 12px 0;
+        }
+
+        .netto-box {
+            background: #fff;
+            padding: 12px 16px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+        }
+
+        .netto-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .netto-value {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .compare-result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .match { background: #E1F5FE; color: #0288D1; }
+        .diff { background: #FFEBEE; color: #C62828; }
+
+        .about-card {
+            background: var(--primary-light);
+            padding: 18px;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .about-card p {
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--text-main);
+            margin: 0 0 12px 0;
+        }
+
+        .contact-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .contact-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .swap-item {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .swap-info strong { color: var(--primary); }
+        .btn-delete-swap {
+            background: #FFF5F5;
+            color: var(--error-color);
+            border: none;
+            padding: 6px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .calc-display {
+            width: 100%;
+            background: #2D3732;
+            color: #fff;
+            font-size: 24px;
+            text-align: right;
+            padding: 14px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            border: none;
+        }
+
+        .calc-btn {
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            border-radius: 10px;
+            background: var(--bg-color);
+            color: var(--text-main);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .calc-btn:active { background: var(--border-color); }
+        .calc-btn.op { background: var(--primary-light); color: var(--primary); }
+        .calc-btn.eq { background: var(--primary); color: #fff; grid-column: span 2; }
+
+        .footer-note {
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 20px;
+        }
+
+        .participant-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            background: #fff;
+            padding: 8px 10px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+        .participant-row input[type="text"] {
+            padding: 6px 10px;
+            font-size: 13px;
+            border: 1px solid var(--border-color);
+        }
+        .participant-row input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="mainContainer">
+    
+    <!-- SETUP SCREEN -->
+    <div id="setup-screen">
+        <div class="setup-logo">🌱</div>
+        <div class="setup-title">Shiftly Setup</div>
+        <div class="setup-subtitle">Please personalize your workspace preference</div>
+
+        <div class="form-group" style="text-align: left;">
+            <label for="inputName">Your Name / Nama Anda</label>
+            <input type="text" id="inputName" placeholder="e.g., Alex Turner" oninput="clearError(this)">
+        </div>
+
+        <div class="form-group" style="text-align: left;">
+            <label for="inputLang">Select Language / Pilih Bahasa</label>
+            <select id="inputLang" onchange="clearError(this)">
+                <option value="id">Bahasa Indonesia</option>
+                <option value="en">English</option>
+                <option value="jp">日本語 (Japanese)</option>
+                <option value="fr">Français (French)</option>
+                <option value="es">Español (Spanish)</option>
+            </select>
+        </div>
+
+        <button class="btn-main" onclick="startApp()"><i class="fa-solid fa-arrow-right"></i> Continue / Masuk</button>
+        
+        <div class="footer-note" style="margin-top: 30px;">
+            Build For Smart Professional
+        </div>
+    </div>
+
+    <!-- MAIN APP SCREEN -->
+    <div id="main-app">
+        <div class="app-header">
+            <div class="welcome-user" id="displayWelcome">Hello, User</div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <button onclick="resetUserSession()" style="background: none; border: none; font-size: 11px; color: var(--error-color); cursor: pointer; font-weight: 600;" title="Ganti Nama">
+                    <i class="fa-solid fa-user-pen"></i> <span id="btnEditUserText">Ganti Nama</span>
+                </button>
+                <div class="lang-switcher-inline">
+                    <select id="globalLangSelect" onchange="changeLanguageInline(this.value)">
+                        <option value="id">🇮🇩 ID</option>
+                        <option value="en">🇬🇧 EN</option>
+                        <option value="jp">🇯🇵 JP</option>
+                        <option value="fr">🇫🇷 FR</option>
+                        <option value="es">🇪🇸 ES</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="app-title-area">
+            <h1>🌱 Shiftly</h1>
+            <p class="subtitle">Smart Overtime & Monthly Payroll Calculator</p>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('calc')"><i class="fa-solid fa-calculator"></i><br><span id="tabNameCalc">Payroll Calc</span></button>
+            <button class="tab-btn" onclick="switchTab('others')"><i class="fa-solid fa-toolbox"></i><br><span id="tabNameOthers">Other Tools</span></button>
+            <button class="tab-btn" onclick="switchTab('info')"><i class="fa-solid fa-circle-info"></i><br><span id="tabNameInfo">About & Feedback</span></button>
+        </div>
+
+        <!-- TAB 1: CALCULATOR -->
+        <div id="tab-calc" class="tab-content active">
+            <div class="tab-body-scroll">
+                <div class="form-group">
+                    <label for="gajiPokok" id="lblGajiPokok">Base Salary + Fixed Allowance (Rp)</label>
+                    <input type="text" id="gajiPokok" placeholder="e.g., 6.000.000" oninput="clearError(this)" onkeyup="formatInputRupiah(this)">
+                </div>
+
+                <div class="form-group">
+                    <div class="form-row">
+                        <div>
+                            <label for="hariLemburKerja" id="lblHariKerja">Jumlah Hari lembur (hari kerja)</label>
+                            <input type="number" id="hariLemburKerja" placeholder="e.g., 5" min="0" oninput="clearError(this)">
+                        </div>
+                        <div>
+                            <label for="jamLemburKerja" id="lblJamKerja">Total Jam lembur (hari kerja)</label>
+                            <input type="number" id="jamLemburKerja" placeholder="e.g., 10" min="0" oninput="clearError(this)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-row">
+                        <div>
+                            <label for="hariLemburLibur" id="lblHariLibur">Jumlah Hari lembur (hari libur)</label>
+                            <input type="number" id="hariLemburLibur" placeholder="e.g., 1" min="0" oninput="clearError(this)">
+                        </div>
+                        <div>
+                            <label for="jamLemburLibur" id="lblJamLibur">Total Jam lembur (hari libur)</label>
+                            <input type="number" id="jamLemburLibur" placeholder="e.g., 8" min="0" oninput="clearError(this)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="insentifTambahan" id="lblInsentif">Additional Incentive / Bonus (Rp)</label>
+                    <input type="text" id="insentifTambahan" placeholder="e.g., 500.000" oninput="clearError(this)" onkeyup="formatInputRupiah(this)">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bpjsPersen" id="lblBpjsPersen">BPJS Deduction (%)</label>
+                        <input type="number" id="bpjsPersen" value="3" min="0" max="100" placeholder="e.g., 3" oninput="clearError(this)">
+                    </div>
+                    <div class="form-group">
+                        <label for="pajakPersen" id="lblPajakPersen">Tax PPh 21 (%)</label>
+                        <input type="number" id="pajakPersen" value="5" min="0" max="100" placeholder="e.g., 5" oninput="clearError(this)">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="potonganTambahan" id="lblPotongan">Other Deductions / Cash Advance (Rp)</label>
+                    <input type="text" id="potonganTambahan" placeholder="e.g., 0" oninput="clearError(this)" onkeyup="formatInputRupiah(this)">
+                </div>
+
+                <button class="btn-main" onclick="hitungPayroll()"><i class="fa-solid fa-wand-magic-sparkles"></i> <span id="btnCalculateText">Calculate Now</span></button>
+
+                <!-- Result Breakdown -->
+                <div class="result-box" id="hasil" style="display:none;">
+                    <h3 id="resTitle"><i class="fa-solid fa-receipt"></i> Breakdown Summary</h3>
+                    <div class="result-row">
+                        <span id="resLblHourly">Hourly Rate (1/173):</span>
+                        <strong id="resUpahJam">-</strong>
+                    </div>
+                    <div class="result-row">
+                        <span id="resLblOvertime">Total Overtime Pay:</span>
+                        <strong id="resLembur">-</strong>
+                    </div>
+                    <div class="result-row">
+                        <span id="resLblIncentive">Additional Incentive:</span>
+                        <strong id="resInsentif">-</strong>
+                    </div>
+                    <hr class="result-divider">
+                    <div class="result-row">
+                        <span id="resLblBpjs">BPJS Deduction:</span>
+                        <strong id="resTotalBpjs" style="color: #c0392b;">-</strong>
+                    </div>
+                    <div class="result-row">
+                        <span id="resLblTax">Tax Deduction:</span>
+                        <strong id="resPajak" style="color: #c0392b;">-</strong>
+                    </div>
+                    <div class="result-row">
+                        <span id="resLblOtherDed">Other Deductions:</span>
+                        <strong id="resPotonganLain" style="color: #c0392b;">-</strong>
+                    </div>
+                    
+                    <div class="netto-box">
+                        <span class="netto-label" id="resLblNetto">Take Home Pay:</span>
+                        <span class="netto-value" id="resNetto">-</span>
+                    </div>
+
+                    <!-- SLIP CHECK -->
+                    <div style="margin-top: 14px; background: #fff; padding: 12px; border-radius: 12px; border: 1px solid var(--border-color);">
+                        <label for="gajiAsliSlip" id="lblSlipInput" style="font-size: 12px; margin-bottom: 4px;">Actual Take Home Pay on Payslip (Rp)</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" id="gajiAsliSlip" placeholder="e.g., 5.850.000" oninput="clearError(this)" onkeyup="formatInputRupiah(this)" style="font-size: 13px; padding: 8px 10px;">
+                            <button class="btn-main" onclick="bandingkanSlip()" style="margin-top: 0; padding: 8px 12px; font-size: 12px; width: auto; white-space: nowrap;"><i class="fa-solid fa-magnifying-glass-chart"></i> <span id="btnCheckVariance">Cek</span></button>
+                        </div>
+                        <div id="compareResultContainer"></div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn-main btn-secondary" onclick="resetForm()"><i class="fa-solid fa-rotate-right"></i> <span id="btnResetText">Reset</span></button>
+                        <button class="btn-main" onclick="shareSummary()"><i class="fa-solid fa-copy"></i> <span id="btnCopyText">Copy Summary</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: OTHER TOOLS -->
+        <div id="tab-others" class="tab-content">
+            <div class="form-group" style="margin-bottom: 14px;">
+                <label for="toolSelector" id="lblSelectTool">Select Tool</label>
+                <select id="toolSelector" onchange="switchTool(this.value)">
+                    <option value="split" id="optToolSplit">🧾 Split Bill (Patungan)</option>
+                    <option value="target" id="optToolTarget">🎯 Target Lembur (Overtime Goal)</option>
+                    <option value="calc" id="optToolCalc">🔢 Kalkulator</option>
+                    <option value="swap" id="optToolSwap">🔄 Catatan Tukar Shift</option>
+                </select>
+            </div>
+
+            <div class="tab-body-scroll">
+                <!-- TOOL A: SPLIT BILL -->
+                <div id="subtool-split" class="subtool-content">
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;" id="splitDesc">Quick Bill Splitter: Calculate team lunch or coffee break expenses fairly with tax & custom participants.</p>
+                    
+                    <div class="form-group">
+                        <label for="totalBill" id="lblTotalBill">Total Subtotal Bill (Rp)</label>
+                        <input type="text" id="totalBill" placeholder="e.g., 250.000" oninput="clearError(this)" onkeyup="formatInputRupiah(this)">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="splitTaxCategory" id="lblSplitTax">Tax / Service Rate</label>
+                            <select id="splitTaxCategory">
+                                <option value="0" id="optTax0">0% (Tanpa Pajak / No Tax)</option>
+                                <option value="10" selected id="optTax10">10% (Restoran & Layanan / Restaurant Tax)</option>
+                                <option value="11" id="optTax11">11% (PPN Pemerintah / Government VAT)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="totalPerson" id="lblTotalPerson">Number of Persons</label>
+                            <input type="number" id="totalPerson" placeholder="e.g., 4" min="1" oninput="clearError(this); generateParticipantInputs();">
+                        </div>
+                    </div>
+
+                    <button class="btn-main" onclick="hitungPatungan()"><i class="fa-solid fa-calculator"></i> <span id="btnSplitText">Calculate Split</span></button>
+
+                    <div class="result-box" id="hasilPatungan" style="display:none;">
+                        <h3 id="resSplitTitle"><i class="fa-solid fa-receipt"></i> Split Summary</h3>
+                        <div class="result-row">
+                            <span id="resLblGrandTotal">Grand Total (inc. Tax):</span>
+                            <strong id="resSplitGrandTotal">-</strong>
+                        </div>
+                        <div class="result-row">
+                            <span id="resLblPerPerson">Per Person Share:</span>
+                            <strong id="resSharePerPerson">-</strong>
+                        </div>
+
+                        <div style="margin-top: 14px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <label style="font-size: 12px; font-weight: 700;" id="lblListParticipant">Daftar Patungan & Cek Pembayaran:</label>
+                                <button onclick="resetSplitStorage()" style="background: none; border: none; font-size: 10px; color: var(--error-color); cursor: pointer; font-weight: 600;"><i class="fa-solid fa-trash"></i> Reset Data</button>
+                            </div>
+                            <div id="participantContainer"></div>
+                        </div>
+
+                        <div style="margin-top: 14px; background: #fff; padding: 12px; border-radius: 12px; border: 1px solid var(--border-color);">
+                            <label style="font-size: 12px; margin-bottom: 4px; font-weight: 700;" id="lblTemplateTitle">Template Pesan Penagihan:</label>
+                            <textarea id="splitTemplateMessage" rows="3" style="width: 100%; font-size: 12px; padding: 8px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-color); box-sizing: border-box;" readonly></textarea>
+                            <button class="btn-main" onclick="copySplitTemplate()" style="margin-top: 8px; padding: 8px; font-size: 12px;"><i class="fa-solid fa-copy"></i> <span id="btnCopyTemplate">Salin Pesan Template</span></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TOOL D: OVERTIME TARGET CALCULATOR (REVISI) -->
+                <div id="subtool-target" class="subtool-content" style="display: none;">
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;" id="targetDesc">Overtime Target Calculator: Tentukan target nominal lembur dan dapatkan rincian rate serta estimasi hari kerja.</p>
+                    
+                    <div class="form-group">
+                        <label for="targetGapok" id="lblTargetGapok">Base Salary / Gaji Pokok (Rp)</label>
+                        <input type="text" id="targetGapok" placeholder="e.g., 6.000.000" oninput="clearError(this)" onkeyup="formatInputRupiah(this)">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="targetNominal" id="lblTargetNominal">Target Nominal Lembur (Rp)</label>
+                        <input type="text" id="targetNominal" placeholder="e.g., 2.000.000" oninput="clearError(this)" onkeyup="formatInputRupiah(this)">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="targetMaksJam" id="lblTargetMaksJam">Maksimal Jam Lembur 1 Hari (Hari Kerja)</label>
+                        <input type="number" id="targetMaksJam" placeholder="e.g., 2" min="1" max="5" oninput="clearError(this)">
+                    </div>
+
+                    <button class="btn-main" onclick="hitungTargetLembur()"><i class="fa-solid fa-bullseye"></i> <span id="btnTargetText">Hitung Target Lembur</span></button>
+
+                    <div class="result-box" id="hasilTarget" style="display:none;">
+                        <h3 id="resTargetTitle"><i class="fa-solid fa-chart-line"></i> Rekomendasi Target Lembur</h3>
+                        <div class="result-row">
+                            <span id="resLblTargetHourly">Nomimal Rate (Gapok / 173):</span>
+                            <strong id="resTargetUpahJam">-</strong>
+                        </div>
+                        <div class="result-row">
+                            <span id="resLblRate1">Rate Jam ke-1 (1.5x):</span>
+                            <strong id="resTargetRate1">-</strong>
+                        </div>
+                        <div class="result-row">
+                            <span id="resLblRate2">Rate Jam ke-2 dst (2.0x):</span>
+                            <strong id="resTargetRate2">-</strong>
+                        </div>
+                        <div class="result-row">
+                            <span id="resLblMaksHarian">Nominal Maksimal Lembur 1 Hari:</span>
+                            <strong id="resTargetMaksHarian">-</strong>
+                        </div>
+                        <hr class="result-divider">
+                        <div class="result-row">
+                            <span id="resLblTotalJamDibutuhkan">Total Jam Lembur Dibutuhkan:</span>
+                            <strong id="resTargetTotalJam">-</strong>
+                        </div>
+                        <div class="netto-box">
+                            <span class="netto-label" id="resLblHariDibutuhkan">Estimasi Hari Kerja Lembur:</span>
+                            <span class="netto-value" id="resTargetHariDibutuhkan">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TOOL B: KALKULATOR -->
+                <div id="subtool-calc" class="subtool-content" style="display: none;">
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;" id="stdCalcDesc">Standard Calculator: Handy numerical assistant for quick daily computations.</p>
+                    
+                    <input type="text" class="calc-display" id="calcDisplay" readonly value="0">
+                    <div class="calc-grid">
+                        <button class="calc-btn op" onclick="calcClear()">C</button>
+                        <button class="calc-btn op" onclick="calcAppend('/')">÷</button>
+                        <button class="calc-btn op" onclick="calcAppend('*')">×</button>
+                        <button class="calc-btn op" onclick="calcBack()">⌫</button>
+                        
+                        <button class="calc-btn" onclick="calcAppend('7')">7</button>
+                        <button class="calc-btn" onclick="calcAppend('8')">8</button>
+                        <button class="calc-btn" onclick="calcAppend('9')">9</button>
+                        <button class="calc-btn op" onclick="calcAppend('-')">-</button>
+                        
+                        <button class="calc-btn" onclick="calcAppend('4')">4</button>
+                        <button class="calc-btn" onclick="calcAppend('5')">5</button>
+                        <button class="calc-btn" onclick="calcAppend('6')">6</button>
+                        <button class="calc-btn op" onclick="calcAppend('+')">+</button>
+                        
+                        <button class="calc-btn" onclick="calcAppend('1')">1</button>
+                        <button class="calc-btn" onclick="calcAppend('2')">2</button>
+                        <button class="calc-btn" onclick="calcAppend('3')">3</button>
+                        <button class="calc-btn eq" onclick="calcCompute()" style="grid-row: span 2;">=</button>
+                        
+                        <button class="calc-btn" onclick="calcAppend('0')" style="grid-column: span 2;">0</button>
+                        <button class="calc-btn" onclick="calcAppend('.')">.</button>
+                    </div>
+                </div>
+
+                <!-- TOOL C: CATATAN TUKAR SHIFT -->
+                <div id="subtool-swap" class="subtool-content" style="display: none;">
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;" id="swapDesc">Catat jadwal tukar shift dengan rekan kerja agar tidak lupa dan terdokumentasi.</p>
+                    
+                    <div class="form-group">
+                        <label for="swapDate" id="lblSwapDate">Tanggal Tukar Shift</label>
+                        <input type="date" id="swapDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="swapColleague" id="lblSwapColleague">Nama Rekan Kerja</label>
+                        <input type="text" id="swapColleague" placeholder="Misal: Budi Santoso">
+                    </div>
+                    <div class="form-group">
+                        <label for="swapNote" id="lblSwapNote">Keterangan Shift</label>
+                        <input type="text" id="swapNote" placeholder="Misal: Tukar shift pagi jadi siang">
+                    </div>
+
+                    <button class="btn-main" onclick="simpanTukarShift()"><i class="fa-solid fa-floppy-disk"></i> <span id="btnSaveSwap">Simpan Catatan Shift</span></button>
+
+                    <div style="margin-top: 16px;">
+                        <h4 style="font-size: 14px; margin-bottom: 8px; color: var(--text-main);" id="swapListTitle">Daftar Tukar Shift Aktif:</h4>
+                        <div id="swapListContainer"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: ABOUT & FEEDBACK -->
+        <div id="tab-info" class="tab-content">
+            <div class="tab-body-scroll">
+                <div class="about-card">
+                    <h3 style="margin-top: 0; color: var(--primary); font-size: 16px; display: flex; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-seedling"></i> <span id="aboutHeaderTitle">Tentang Shiftly</span>
+                    </h3>
+                    <p id="aboutTextContent">
+                        Selamat datang di Shiftly! Aplikasi cerdas yang dirancang khusus untuk mendampingi para profesional dalam mengelola perhitungan lembur, estimasi gaji bersih (take home pay), hingga kebutuhan finansial harian secara praktis, transparan, dan efisien.
+                    </p>
+                </div>
+
+                <div class="about-card" style="background: #fff; border: 1px solid var(--border-color);">
+                    <h4 style="margin: 0 0 10px 0; font-size: 14px; color: var(--text-main);" id="feedbackCardTitle">Kirim Masukan / Saran</h4>
+                    <div class="form-group" style="margin-bottom: 10px;">
+                        <textarea id="pesanSaran" rows="3" placeholder="Type your message here..." oninput="clearError(this)" style="width: 100%; padding: 12px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 12px; font-family: 'Plus Jakarta Sans'; font-size: 14px; box-sizing: border-box;"></textarea>
+                    </div>
+                    <button class="btn-main btn-wa" onclick="kirimWhatsApp()"><i class="fa-brands fa-whatsapp"></i> <span id="btnSendWa">Send to WhatsApp</span></button>
+                </div>
+
+                <div class="about-card" style="background: #fff; border: 1px solid var(--border-color); margin-top: 16px;">
+                    <h4 style="margin: 0 0 10px 0; font-size: 14px; color: var(--text-main);" id="contactHeaderTitle">Hubungi Pengembang</h4>
+                    <div class="contact-links">
+                        <a href="https://instagram.com/rizalfalq" target="_blank" class="contact-btn btn-ig">
+                            <i class="fa-brands fa-instagram"></i> Instagram : @rizalfalq
+                        </a>
+                        <a href="https://wa.me/6282125803211" target="_blank" class="contact-btn btn-wa">
+                            <i class="fa-brands fa-whatsapp"></i> WhatsApp : 082125803211
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-note">
+            Build For Smart Professional
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentLang = 'id';
+    let currentUserName = '';
+
+    const translations = {
+        id: {
+            welcome: "Halo, {name}! 👋",
+            calc: "Payroll Calc",
+            others: "Other Tools",
+            info: "Tentang & Masukan",
+            lblGajiPokok: "Gaji Pokok + Tunjangan Tetap (Rp)",
+            phGajiPokok: "Contoh: 6.000.000",
+            lblHariKerja: "Jumlah Hari lembur (hari kerja)",
+            lblJamKerja: "Total Jam lembur (hari kerja)",
+            lblHariLibur: "Jumlah Hari lembur (hari libur)",
+            lblJamLibur: "Total Jam lembur (hari libur)",
+            lblInsentif: "Insentif Tambahan / Bonus (Rp)",
+            phInsentif: "Contoh: 500.000",
+            lblBpjsPersen: "Potongan BPJS (%)",
+            lblPajakPersen: "Pajak PPh 21 (%)",
+            lblPotongan: "Potongan Lain / Kasbon / Cicilan (Rp)",
+            phPotongan: "Contoh: 0",
+            btnCalc: "Hitung Sekarang",
+            resTitle: "Rincian Perhitungan",
+            resHourly: "Upah per Jam (1/173):",
+            resOvertime: "Total Upah Lembur:",
+            resIncentive: "Insentif Tambahan:",
+            resBpjs: "Potongan BPJS:",
+            resTax: "Potongan Pajak:",
+            resOtherDed: "Potongan Lainnya:",
+            resNetto: "Take Home Pay:",
+            btnCopy: "Salin Ringkasan",
+            btnReset: "Reset",
+            lblSlip: "Take Home Pay Aktual di Slip Gaji (Rp)",
+            phSlip: "Contoh: 5.850.000",
+            btnVariance: "Cek",
+            lblSelectTool: "Pilih Menu Alat",
+            optToolSplit: "🧾 Split Bill (Patungan)",
+            optToolTarget: "🎯 Target Lembur (Overtime Goal)",
+            optToolCalc: "🔢 Kalkulator",
+            optToolSwap: "🔄 Catatan Tukar Shift",
+            splitDesc: "Bill Splitter: Hitung pengeluaran makan siang tim adil lengkap dengan pajak & template pesan.",
+            lblTotalBill: "Total Subtotal Tagihan (Rp)",
+            phTotalBill: "Contoh: 250.000",
+            lblSplitTax: "Pajak / Layanan (%)",
+            optTax0: "0% (Tanpa Pajak)",
+            optTax10: "10% (Restoran & Layanan)",
+            optTax11: "11% (PPN Pemerintah)",
+            lblTotalPerson: "Jumlah Orang",
+            btnSplit: "Hitung Patungan",
+            resSplitTitle: "Rincian Patungan",
+            resGrandTotal: "Grand Total (inc. Pajak):",
+            resPerPerson: "Beban Per Orang:",
+            lblListParticipant: "Daftar Orang & Cek Progress Pembayaran:",
+            lblTemplateTitle: "Template Pesan Penagihan:",
+            btnCopyTemplate: "Salin Pesan Template",
+            targetDesc: "Overtime Target Calculator: Tentukan target nominal lembur dan dapatkan rincian rate serta estimasi hari kerja.",
+            lblTargetGapok: "Gaji Pokok / Base Salary (Rp)",
+            lblTargetNominal: "Target Nominal Lembur (Rp)",
+            lblTargetMaksJam: "Maksimal Jam Lembur 1 Hari (Hari Kerja)",
+            btnTargetText: "Hitung Target Lembur",
+            resTargetTitle: "Rekomendasi Target Lembur",
+            resLblTargetHourly: "Nomimal Rate (Gapok / 173):",
+            resLblRate1: "Rate Jam ke-1 (1.5x):",
+            resLblRate2: "Rate Jam ke-2 dst (2.0x):",
+            resLblMaksHarian: "Nominal Maksimal Lembur 1 Hari:",
+            resLblTotalJamDibutuhkan: "Total Jam Lembur Dibutuhkan:",
+            resLblHariDibutuhkan: "Estimasi Hari Kerja Lembur:",
+            stdCalcDesc: "Kalkulator Standar: Alat bantu cepat untuk perhitungan angka harian.",
+            swapDesc: "Catat jadwal tukar shift dengan rekan kerja agar tidak lupa dan terdokumentasi.",
+            lblSwapDate: "Tanggal Tukar Shift",
+            lblSwapColleague: "Nama Rekan Kerja",
+            lblSwapNote: "Keterangan Shift",
+            btnSaveSwap: "Simpan Catatan Shift",
+            swapListTitle: "Daftar Tukar Shift Aktif:",
+            aboutHeaderTitle: "Tentang Shiftly",
+            aboutTextContent: "Selamat datang di Shiftly! Aplikasi cerdas yang dirancang khusus untuk mendampingi para profesional dalam mengelola perhitungan lembur, estimasi gaji bersih, hingga kebutuhan finansial.",
+            contactHeaderTitle: "Hubungi Pengembang",
+            feedbackCardTitle: "Kirim Masukan / Saran",
+            phFeedback: "Tulis pesan Anda di sini...",
+            btnSendWa: "Kirim ke WhatsApp",
+            btnEditUserText: "Ganti Nama"
+        },
+        en: {
+            welcome: "Hello, {name}! 👋",
+            calc: "Payroll Calc",
+            others: "Other Tools",
+            info: "About & Feedback",
+            lblGajiPokok: "Base Salary + Fixed Allowance (Rp)",
+            phGajiPokok: "e.g., 6.000.000",
+            lblHariKerja: "Overtime Days (Working Day)",
+            lblJamKerja: "Overtime Hours (Working Day)",
+            lblHariLibur: "Overtime Days (Holiday)",
+            lblJamLibur: "Overtime Hours (Holiday)",
+            lblInsentif: "Additional Incentive / Bonus (Rp)",
+            phInsentif: "e.g., 500.000",
+            lblBpjsPersen: "BPJS Deduction (%)",
+            lblPajakPersen: "Tax PPh 21 (%)",
+            lblPotongan: "Other Deductions / Cash Advance (Rp)",
+            phPotongan: "e.g., 0",
+            btnCalc: "Calculate Now",
+            resTitle: "Breakdown Summary",
+            resHourly: "Hourly Rate (1/173):",
+            resOvertime: "Total Overtime Pay:",
+            resIncentive: "Additional Incentive:",
+            resBpjs: "BPJS Deduction:",
+            resTax: "Tax Deduction:",
+            resOtherDed: "Other Deductions:",
+            resNetto: "Take Home Pay:",
+            btnCopy: "Copy Summary",
+            btnReset: "Reset",
+            lblSlip: "Actual Take Home Pay on Payslip (Rp)",
+            phSlip: "e.g., 5.850.000",
+            btnVariance: "Check",
+            lblSelectTool: "Select Tool",
+            optToolSplit: "🧾 Split Bill",
+            optToolTarget: "🎯 Overtime Goal",
+            optToolCalc: "🔢 Calculator",
+            optToolSwap: "🔄 Shift Swap Notes",
+            splitDesc: "Quick Bill Splitter: Calculate expenses fairly with tax & message template.",
+            lblTotalBill: "Total Subtotal Bill (Rp)",
+            phTotalBill: "e.g., 250.000",
+            lblSplitTax: "Tax / Service Rate",
+            optTax0: "0% (No Tax)",
+            optTax10: "10% (Restaurant Tax & Service)",
+            optTax11: "11% (Government VAT)",
+            lblTotalPerson: "Number of Persons",
+            btnSplit: "Calculate Split",
+            resSplitTitle: "Split Summary",
+            resGrandTotal: "Grand Total (inc. Tax):",
+            resPerPerson: "Per Person Share:",
+            lblListParticipant: "Participant List & Progress:",
+            lblTemplateTitle: "Billing Message Template:",
+            btnCopyTemplate: "Copy Template Message",
+            targetDesc: "Overtime Target Calculator: Set your overtime payout goal and get rate breakdown.",
+            lblTargetGapok: "Base Salary (Rp)",
+            lblTargetNominal: "Overtime Nominal Goal (Rp)",
+            lblTargetMaksJam: "Max Overtime Hours per Day (Working Day)",
+            btnTargetText: "Calculate Target",
+            resTargetTitle: "Overtime Goal Recommendation",
+            resLblTargetHourly: "Nominal Rate (Gapok / 173):",
+            resLblRate1: "1st Hour Rate (1.5x):",
+            resLblRate2: "Subsequent Hour Rate (2.0x):",
+            resLblMaksHarian: "Max Daily Overtime Nominal:",
+            resLblTotalJamDibutuhkan: "Total Overtime Hours Needed:",
+            resLblHariDibutuhkan: "Estimated Working Days Needed:",
+            stdCalcDesc: "Standard Calculator: Handy numerical assistant for quick daily computations.",
+            swapDesc: "Note down your shift exchange schedules with colleagues to stay organized.",
+            lblSwapDate: "Shift Exchange Date",
+            lblSwapColleague: "Colleague Name",
+            lblSwapNote: "Shift Details",
+            btnSaveSwap: "Save Shift Note",
+            swapListTitle: "Active Shift Swaps:",
+            aboutHeaderTitle: "About Shiftly",
+            aboutTextContent: "Welcome to Shiftly! A smart application designed specifically to support professionals in managing overtime calculations, net salary estimations, and daily financial needs.",
+            contactHeaderTitle: "Contact Developer",
+            feedbackCardTitle: "Send Feedback / Suggestion",
+            phFeedback: "Type your message here...",
+            btnSendWa: "Send to WhatsApp",
+            btnEditUserText: "Change Name"
+        },
+        jp: {
+            welcome: "こんにちは、{name}さん！ 👋",
+            calc: "Payroll Calc",
+            others: "ツール",
+            info: "情報・フィードバック",
+            lblGajiPokok: "基本給 ＋ 固定手当 (Rp)",
+            phGajiPokok: "例: 6.000.000",
+            lblHariKerja: "残業日数 (労働日)",
+            lblJamKerja: "総残業時間 (労働日)",
+            lblHariLibur: "休日出勤日数 (休日)",
+            lblJamLibur: "休日残業時間 (休日)",
+            lblInsentif: "追加インセンティブ・ボーナス (Rp)",
+            phInsentif: "例: 500.000",
+            lblBpjsPersen: "BPJS控除 (%)",
+            lblPajakPersen: "所得税 (%)",
+            lblPotongan: "その他の控除・前払い (Rp)",
+            phPotongan: "例: 0",
+            btnCalc: "今すぐ計算",
+            resTitle: "内訳サマリー",
+            resHourly: "時給 (1/173):",
+            resOvertime: "総残業手当:",
+            resIncentive: "追加インセンティブ:",
+            resBpjs: "BPJS控除:",
+            resTax: "所得税控除:",
+            resOtherDed: "その他の控除:",
+            resNetto: "手取り額 (Take Home Pay):",
+            btnCopy: "サマリーをコピー",
+            btnReset: "リセット",
+            lblSlip: "給与明細上の実際の手取り額 (Rp)",
+            phSlip: "例: 5.850.000",
+            btnVariance: "確認",
+            lblSelectTool: "ツールを選択",
+            optToolSplit: "🧾 割り勘計算",
+            optToolTarget: "🎯 残業目標計算",
+            optToolCalc: "🔢 計算機",
+            optToolSwap: "🔄 シフト交代メモ",
+            splitDesc: "割り勘計算機：税金込みで公平に計算します。",
+            lblTotalBill: "小計金額 (Rp)",
+            phTotalBill: "例: 250.000",
+            lblSplitTax: "税率 / サービス料",
+            optTax0: "0% (税金なし)",
+            optTax10: "10% (レストラン税・サービス)",
+            optTax11: "11% (政府付加価値税)",
+            lblTotalPerson: "人数",
+            btnSplit: "割り勘を計算",
+            resSplitTitle: "割り勘の内訳",
+            resGrandTotal: "総合計 (税込):",
+            resPerPerson: "1人当たりの負担額:",
+            lblListParticipant: "参加者リストと進捗:",
+            lblTemplateTitle: "請求メッセージテンプレート:",
+            btnCopyTemplate: "テンプレートをコピー",
+            targetDesc: "残業目標計算：目標額から必要な労働日残業時間を計算します。",
+            lblTargetGapok: "基本給 (Rp)",
+            lblTargetNominal: "目標残業金額 (Rp)",
+            lblTargetMaksJam: "1日あたりの最大残業時間 (労働日)",
+            btnTargetText: "目標を計算",
+            resTargetTitle: "残業目標の推奨",
+            resLblTargetHourly: "時給 (1/173):",
+            resLblRate1: "1時間目レート (1.5x):",
+            resLblRate2: "2時間目以降レート (2.0x):",
+            resLblMaksHarian: "1日の最大残業額:",
+            resLblTotalJamDibutuhkan: "必要な総残業時間:",
+            resLblHariDibutuhkan: "必要な労働日数:",
+            stdCalcDesc: "標準計算機：日常の簡単な計算に便利です。",
+            swapDesc: "同僚とのシフト交代予定を記録します。",
+            lblSwapDate: "交代日",
+            lblSwapColleague: "同僚の名前",
+            lblSwapNote: "シフト詳細",
+            btnSaveSwap: "シフトメモを保存",
+            swapListTitle: "有効なシフト交代:",
+            aboutHeaderTitle: "Shiftlyについて",
+            aboutTextContent: "Shiftlyへようこそ！プロフェッショナルの皆様の財務管理をサポートします。",
+            contactHeaderTitle: "開発者へのお問い合わせ",
+            feedbackCardTitle: "フィードバック送信",
+            phFeedback: "ここにメッセージを入力してください...",
+            btnSendWa: "WhatsAppで送信",
+            btnEditUserText: "名前変更"
+        },
+        fr: {
+            welcome: "Bonjour, {name} ! 👋",
+            calc: "Payroll Calc",
+            others: "Outils",
+            info: "Infos & Avis",
+            lblGajiPokok: "Salaire de base + Prime fixe (Rp)",
+            phGajiPokok: "ex : 6.000.000",
+            lblHariKerja: "Jours d'heures supp. (jour ouvrable)",
+            lblJamKerja: "Heures d'heures supp. (jour ouvrable)",
+            lblHariLibur: "Jours d'heures supp. (jour férié)",
+            lblJamLibur: "Heures d'heures supp. (jour férié)",
+            lblInsentif: "Prime supplémentaire / Bonus (Rp)",
+            phInsentif: "ex : 500.000",
+            lblBpjsPersen: "Déduction BPJS (%)",
+            lblPajakPersen: "Taxe PPh 21 (%)",
+            lblPotongan: "Autres déductions / Avance (Rp)",
+            phPotongan: "ex : 0",
+            btnCalc: "Calculer maintenant",
+            resTitle: "Résumé détaillé",
+            resHourly: "Taux horaire (1/173) :",
+            resOvertime: "Total heures supp. :",
+            resIncentive: "Prime supplémentaire :",
+            resBpjs: "Déduction BPJS :",
+            resTax: "Déduction fiscale :",
+            resOtherDed: "Autres déductions :",
+            resNetto: "Salaire net à payer :",
+            btnCopy: "Copier le résumé",
+            btnReset: "Réinitialiser",
+            lblSlip: "Salaire net réel sur le bulletin (Rp)",
+            phSlip: "ex : 5.850.000",
+            btnVariance: "Vérifier",
+            lblSelectTool: "Sélectionner un outil",
+            optToolSplit: "🧾 Partage de facture",
+            optToolTarget: "🎯 Objectif Heures Supp.",
+            optToolCalc: "🔢 Calculatrice",
+            optToolSwap: "🔄 Notes d'échange de shift",
+            splitDesc: "Partage de facture rapide : Calculez équitablement avec taxes.",
+            lblTotalBill: "Montant total de la facture (Rp)",
+            phTotalBill: "ex : 250.000",
+            lblSplitTax: "Taux de taxe / service",
+            optTax0: "0% (Sans taxe)",
+            optTax10: "10% (Taxe restaurant & service)",
+            optTax11: "11% (TVA gouvernementale)",
+            lblTotalPerson: "Nombre de personnes",
+            btnSplit: "Calculer la répartition",
+            resSplitTitle: "Résumé de la répartition",
+            resGrandTotal: "Grand Total (taxes incl.) :",
+            resPerPerson: "Part par personne :",
+            lblListParticipant: "Liste et suivi des paiements :",
+            lblTemplateTitle: "Modèle de message de rappel :",
+            btnCopyTemplate: "Copier le message",
+            targetDesc: "Calculateur d'objectif d'heures supp. : Définissez votre objectif de gain.",
+            lblTargetGapok: "Salaire de base (Rp)",
+            lblTargetNominal: "Objectif nominal d'heures supp. (Rp)",
+            lblTargetMaksJam: "Max heures supp. par jour (Jour ouvrable)",
+            btnTargetText: "Calculer l'objectif",
+            resTargetTitle: "Recommandation d'objectif",
+            resLblTargetHourly: "Taux horaire (1/173) :",
+            resLblRate1: "Taux 1ère heure (1.5x) :",
+            resLblRate2: "Taux heures suivantes (2.0x) :",
+            resLblMaksHarian: "Max journalier heures supp. :",
+            resLblTotalJamDibutuhkan: "Total heures supp. nécessaires :",
+            resLblHariDibutuhkan: "Jours ouvrables estimés :",
+            stdCalcDesc: "Calculatrice standard : Assistant numérique pratique.",
+            swapDesc: "Notez vos horaires d'échange de shift avec vos collègues.",
+            lblSwapDate: "Date d'échange",
+            lblSwapColleague: "Nom du collègue",
+            lblSwapNote: "Détails du shift",
+            btnSaveSwap: "Enregistrer la note",
+            swapListTitle: "Échanges de shifts actifs :",
+            aboutHeaderTitle: "À propos de Shiftly",
+            aboutTextContent: "Bienvenue sur Shiftly ! Une application intelligente conçue pour aider les professionnels.",
+            contactHeaderTitle: "Contacter le développeur",
+            feedbackCardTitle: "Envoyer un avis",
+            phFeedback: "Tapez votre message ici...",
+            btnSendWa: "Envoyer sur WhatsApp",
+            btnEditUserText: "Changer le nom"
+        },
+        es: {
+            welcome: "¡Hola, {name}! 👋",
+            calc: "Payroll Calc",
+            others: "Herramientas",
+            info: "Acerca y Sugerencias",
+            lblGajiPokok: "Salario Base + Asignación Fija (Rp)",
+            phGajiPokok: "ej., 6.000.000",
+            lblHariKerja: "Días de horas extra (día laborable)",
+            lblJamKerja: "Horas de horas extra (día laborable)",
+            lblHariLibur: "Días de horas extra (día festivo)",
+            lblJamLibur: "Horas de horas extra (día festivo)",
+            lblInsentif: "Incentivo adicional / Bono (Rp)",
+            phInsentif: "ej., 500.000",
+            lblBpjsPersen: "Deducción BPJS (%)",
+            lblPajakPersen: "Impuesto PPh 21 (%)",
+            lblPotongan: "Otras deducciones / Anticipo (Rp)",
+            phPotongan: "ej., 0",
+            btnCalc: "Calcular ahora",
+            resTitle: "Desglose de Resumen",
+            resHourly: "Tarifa por hora (1/173):",
+            resOvertime: "Total pago de horas extra:",
+            resIncentive: "Incentivo adicional:",
+            resBpjs: "Deducción BPJS:",
+            resTax: "Deducción de impuestos:",
+            resOtherDed: "Otras deducciones:",
+            resNetto: "Sueldo Neto a Recibir:",
+            btnCopy: "Copiar Resumen",
+            btnReset: "Restablecer",
+            lblSlip: "Sueldo neto real en el recibo (Rp)",
+            phSlip: "ej., 5.850.000",
+            btnVariance: "Verificar",
+            lblSelectTool: "Seleccionar Herramienta",
+            optToolSplit: "🧾 Dividir Cuenta",
+            optToolTarget: "🎯 Meta de Horas Extra",
+            optToolCalc: "🔢 Calculadora",
+            optToolSwap: "🔄 Notas de Cambio de Turno",
+            splitDesc: "Divisor de cuentas rápido: Calcula de forma justa con impuestos incluidos.",
+            lblTotalBill: "Monto total de la factura (Rp)",
+            phTotalBill: "ej., 250.000",
+            lblSplitTax: "Tasa de impuesto / servicio",
+            optTax0: "0% (Sin impuestos)",
+            optTax10: "10% (Impuesto de restaurante y servicio)",
+            optTax11: "11% (IVA gubernamental)",
+            lblTotalPerson: "Número de personas",
+            btnSplit: "Calcular División",
+            resSplitTitle: "Resumen de División",
+            resGrandTotal: "Gran Total (con imp.):",
+            resPerPerson: "Porción por persona:",
+            lblListParticipant: "Lista de participantes y progreso:",
+            lblTemplateTitle: "Plantilla de mensaje de cobro:",
+            btnCopyTemplate: "Copiar plantilla",
+            targetDesc: "Calculadora de meta de horas extra: Define tu objetivo y obtén tarifas.",
+            lblTargetGapok: "Salario Base (Rp)",
+            lblTargetNominal: "Meta Nominal de Horas Extra (Rp)",
+            lblTargetMaksJam: "Max horas extra al día (Día laborable)",
+            btnTargetText: "Calcular Meta",
+            resTargetTitle: "Recomendación de Meta",
+            resLblTargetHourly: "Tarifa por hora (1/173):",
+            resLblRate1: "Tarifa 1ra hora (1.5x):",
+            resLblRate2: "Tarifa horas siguientes (2.0x):",
+            resLblMaksHarian: "Máximo nominal diario de horas extra:",
+            resLblTotalJamDibutuhkan: "Total de horas extra necesarias:",
+            resLblHariDibutuhkan: "Días laborables estimados necesarios:",
+            stdCalcDesc: "Calculadora Estándar: Asistente numérico rápido para el día a día.",
+            swapDesc: "Anota tus horarios de cambio de turno con colegas.",
+            lblSwapDate: "Fecha de Cambio",
+            lblSwapColleague: "Nombre del Colega",
+            lblSwapNote: "Detalles del Turno",
+            btnSaveSwap: "Guardar Nota de Turno",
+            swapListTitle: "Cambios de Turno Activos:",
+            aboutHeaderTitle: "Acerca de Shiftly",
+            aboutTextContent: "¡Bienvenido a Shiftly! Una aplicación inteligente diseñada para profesionales.",
+            contactHeaderTitle: "Contactar al Desarrollador",
+            feedbackCardTitle: "Enviar Sugerencia",
+            phFeedback: "Escriba su mensaje aquí...",
+            btnSendWa: "Enviar a WhatsApp",
+            btnEditUserText: "Cambiar Nombre"
+        }
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+        let savedName = localStorage.getItem('shiftly_username');
+        let savedLang = localStorage.getItem('shiftly_lang');
+
+        if (savedName) {
+            currentUserName = savedName;
+            currentLang = savedLang || 'id';
+            document.getElementById('globalLangSelect').value = currentLang;
+            applyLanguage();
+            document.getElementById('setup-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'flex';
+        }
+        muatDaftarShiftSwap();
+        muatDataPatunganStorage();
+
+        const allInputs = document.querySelectorAll('input, select, textarea');
+        allInputs.forEach(element => {
+            element.addEventListener('focus', function() {
+                setTimeout(() => {
+                    this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            });
+        });
+    });
+
+    function startApp() {
+        let nameInput = document.getElementById('inputName');
+        let langInput = document.getElementById('inputLang');
+        let nameVal = nameInput.value.trim();
+
+        if (nameVal === "") {
+            nameInput.classList.add('error-input');
+            alert(langInput.value === 'id' ? "⚠️ Perhatian: Mohon masukkan nama Anda terlebih dahulu!" : "⚠️ Warning: Please enter your name first!");
+            return;
+        }
+
+        currentUserName = nameVal;
+        currentLang = langInput.value;
+
+        localStorage.setItem('shiftly_username', currentUserName);
+        localStorage.setItem('shiftly_lang', currentLang);
+
+        document.getElementById('globalLangSelect').value = currentLang;
+        applyLanguage();
+
+        document.getElementById('setup-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'flex';
+    }
+
+    function resetUserSession() {
+        if(confirm(currentLang === 'id' ? "Apakah Anda ingin mengganti nama sesi user?" : "Do you want to change user name session?")) {
+            localStorage.removeItem('shiftly_username');
+            document.getElementById('main-app').style.display = 'none';
+            document.getElementById('setup-screen').style.display = 'block';
+            document.getElementById('inputName').value = currentUserName;
+        }
+    }
+
+    function changeLanguageInline(newLang) {
+        currentLang = newLang;
+        localStorage.setItem('shiftly_lang', currentLang);
+        document.getElementById('globalLangSelect').value = currentLang;
+        applyLanguage();
+    }
+
+    function applyLanguage() {
+        let t = translations[currentLang];
+        
+        document.getElementById('displayWelcome').innerText = t.welcome.replace('{name}', currentUserName);
+        document.getElementById('tabNameCalc').innerText = t.calc;
+        document.getElementById('tabNameOthers').innerText = t.others;
+        document.getElementById('tabNameInfo').innerText = t.info;
+        document.getElementById('btnEditUserText').innerText = t.btnEditUserText;
+
+        document.getElementById('lblGajiPokok').innerText = t.lblGajiPokok;
+        document.getElementById('gajiPokok').placeholder = t.phGajiPokok;
+        document.getElementById('lblHariKerja').innerText = t.lblHariKerja;
+        document.getElementById('lblJamKerja').innerText = t.lblJamKerja;
+        document.getElementById('lblHariLibur').innerText = t.lblHariLibur;
+        document.getElementById('lblJamLibur').innerText = t.lblJamLibur;
+        document.getElementById('lblInsentif').innerText = t.lblInsentif;
+        document.getElementById('insentifTambahan').placeholder = t.phInsentif;
+        document.getElementById('lblBpjsPersen').innerText = t.lblBpjsPersen;
+        document.getElementById('lblPajakPersen').innerText = t.lblPajakPersen;
+        document.getElementById('lblPotongan').innerText = t.lblPotongan;
+        document.getElementById('potonganTambahan').placeholder = t.phPotongan;
+        document.getElementById('btnCalculateText').innerText = t.btnCalc;
+
+        document.getElementById('resTitle').innerHTML = `<i class="fa-solid fa-receipt"></i> ${t.resTitle}`;
+        document.getElementById('resLblHourly').innerText = t.resHourly;
+        document.getElementById('resLblOvertime').innerText = t.resOvertime;
+        document.getElementById('resLblIncentive').innerText = t.resIncentive;
+        document.getElementById('resLblBpjs').innerText = t.resBpjs;
+        document.getElementById('resLblTax').innerText = t.resTax;
+        document.getElementById('resLblOtherDed').innerText = t.resOtherDed;
+        document.getElementById('resLblNetto').innerText = t.resNetto;
+        document.getElementById('btnCopyText').innerText = t.btnCopy;
+        document.getElementById('btnResetText').innerText = t.btnReset;
+
+        document.getElementById('lblSlipInput').innerText = t.lblSlip;
+        document.getElementById('gajiAsliSlip').placeholder = t.phSlip;
+        document.getElementById('btnCheckVariance').innerText = t.btnVariance;
+
+        document.getElementById('lblSelectTool').innerText = t.lblSelectTool;
+        document.getElementById('optToolSplit').innerText = t.optToolSplit;
+        document.getElementById('optToolTarget').innerText = t.optToolTarget;
+        document.getElementById('optToolCalc').innerText = t.optToolCalc;
+        document.getElementById('optToolSwap').innerText = t.optToolSwap;
+
+        document.getElementById('splitDesc').innerText = t.splitDesc;
+        document.getElementById('lblTotalBill').innerText = t.lblTotalBill;
+        document.getElementById('totalBill').placeholder = t.phTotalBill;
+        document.getElementById('lblSplitTax').innerText = t.lblSplitTax;
+        document.getElementById('optTax0').innerText = t.optTax0;
+        document.getElementById('optTax10').innerText = t.optTax10;
+        document.getElementById('optTax11').innerText = t.optTax11;
+        document.getElementById('lblTotalPerson').innerText = t.lblTotalPerson;
+        document.getElementById('btnSplitText').innerText = t.btnSplit;
+        document.getElementById('resSplitTitle').innerHTML = `<i class="fa-solid fa-receipt"></i> ${t.resSplitTitle}`;
+        document.getElementById('resLblGrandTotal').innerText = t.resGrandTotal;
+        document.getElementById('resLblPerPerson').innerText = t.resPerPerson;
+        document.getElementById('lblListParticipant').innerText = t.lblListParticipant;
+        document.getElementById('lblTemplateTitle').innerText = t.lblTemplateTitle;
+        document.getElementById('btnCopyTemplate').innerText = t.btnCopyTemplate;
+
+        document.getElementById('targetDesc').innerText = t.targetDesc;
+        document.getElementById('lblTargetGapok').innerText = t.lblTargetGapok;
+        document.getElementById('lblTargetNominal').innerText = t.lblTargetNominal;
+        document.getElementById('lblTargetMaksJam').innerText = t.lblTargetMaksJam;
+        document.getElementById('btnTargetText').innerText = t.btnTargetText;
+        document.getElementById('resTargetTitle').innerHTML = `<i class="fa-solid fa-chart-line"></i> ${t.resTargetTitle}`;
+        document.getElementById('resLblTargetHourly').innerText = t.resLblTargetHourly;
+        document.getElementById('resLblRate1').innerText = t.resLblRate1;
+        document.getElementById('resLblRate2').innerText = t.resLblRate2;
+        document.getElementById('resLblMaksHarian').innerText = t.resLblMaksHarian;
+        document.getElementById('resLblTotalJamDibutuhkan').innerText = t.resLblTotalJamDibutuhkan;
+        document.getElementById('resLblHariDibutuhkan').innerText = t.resLblHariDibutuhkan;
+
+        document.getElementById('stdCalcDesc').innerText = t.stdCalcDesc;
+        document.getElementById('swapDesc').innerText = t.swapDesc;
+        document.getElementById('lblSwapDate').innerText = t.lblSwapDate;
+        document.getElementById('lblSwapColleague').innerText = t.lblSwapColleague;
+        document.getElementById('lblSwapNote').innerText = t.lblSwapNote;
+        document.getElementById('btnSaveSwap').innerText = t.btnSaveSwap;
+        document.getElementById('swapListTitle').innerText = t.swapListTitle;
+
+        document.getElementById('aboutHeaderTitle').innerText = t.aboutHeaderTitle;
+        document.getElementById('aboutTextContent').innerText = t.aboutTextContent;
+        document.getElementById('contactHeaderTitle').innerText = t.contactHeaderTitle;
+        document.getElementById('feedbackCardTitle').innerText = t.feedbackCardTitle;
+        document.getElementById('pesanSaran').placeholder = t.phFeedback;
+        document.getElementById('btnSendWa').innerText = t.btnSendWa;
+    }
+
+    function formatRupiahText(angka) {
+        return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    function parseRupiah(string) {
+        if (!string) return 0;
+        return parseFloat(string.toString().replace(/\./g, '')) || 0;
+    }
+
+    function formatInputRupiah(input) {
+        let value = input.value.replace(/[^,\d]/g, '').toString();
+        let split = value.split(',');
+        let sisa = split[0].length % 3;
+        let rupiah = split[0].substr(0, sisa);
+        let ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+        if (ribuan) {
+            let separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+
+        input.value = rupiah;
+    }
+
+    function clearError(element) {
+        element.classList.remove('error-input');
+    }
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+        if(tabId === 'calc') {
+            document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            document.getElementById('tab-calc').classList.add('active');
+        } else if(tabId === 'others') {
+            document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            document.getElementById('tab-others').classList.add('active');
+        } else if(tabId === 'info') {
+            document.querySelectorAll('.tab-btn')[2].classList.add('active');
+            document.getElementById('tab-info').classList.add('active');
+        }
+    }
+
+    function switchTool(toolId) {
+        document.querySelectorAll('.subtool-content').forEach(el => el.style.display = 'none');
+        if(document.getElementById('subtool-' + toolId)) {
+            document.getElementById('subtool-' + toolId).style.display = 'block';
+        }
+    }
+
+    let globalNetto = 0;
+
+    function hitungPayroll() {
+        let fields = [
+            { id: 'gajiPokok', val: document.getElementById('gajiPokok').value.trim() },
+            { id: 'hariLemburKerja', val: document.getElementById('hariLemburKerja').value.trim() },
+            { id: 'jamLemburKerja', val: document.getElementById('jamLemburKerja').value.trim() },
+            { id: 'hariLemburLibur', val: document.getElementById('hariLemburLibur').value.trim() },
+            { id: 'jamLemburLibur', val: document.getElementById('jamLemburLibur').value.trim() },
+            { id: 'insentifTambahan', val: document.getElementById('insentifTambahan').value.trim() },
+            { id: 'bpjsPersen', val: document.getElementById('bpjsPersen').value.trim() },
+            { id: 'pajakPersen', val: document.getElementById('pajakPersen').value.trim() },
+            { id: 'potonganTambahan', val: document.getElementById('potonganTambahan').value.trim() }
+        ];
+
+        let hasError = false;
+        fields.forEach(f => {
+            let el = document.getElementById(f.id);
+            if (f.val === "") {
+                el.classList.add('error-input');
+                hasError = true;
+            } else {
+                el.classList.remove('error-input');
+            }
+        });
+
+        if (hasError) {
+            alert(currentLang === 'id' ? "⚠️ Perhatian: Mohon isi semua kolom yang kosong." : "⚠️ Warning: Please fill in all empty fields.");
+            return;
+        }
+
+        let gajiPokok = parseRupiah(fields[0].val);
+        let hariLemburKerja = parseFloat(fields[1].val) || 0;
+        let jamLemburKerja = parseFloat(fields[2].val) || 0;
+        let hariLemburLibur = parseFloat(fields[3].val) || 0;
+        let jamLemburLibur = parseFloat(fields[4].val) || 0;
+        let insentifTambahan = parseRupiah(fields[5].val);
+        let bpjsRate = (parseFloat(fields[6].val) || 0) / 100;
+        let pajakRate = (parseFloat(fields[7].val) || 0) / 100;
+        let potonganTambahan = parseRupiah(fields[8].val);
+
+        let upahPerJam = gajiPokok / 173;
+        let totalLemburKerja = 0;
+
+        if (jamLemburKerja > 0) {
+            let hari = hariLemburKerja > 0 ? hariLemburKerja : 1; 
+            let jamPertama1_5 = Math.min(jamLemburKerja, hari); 
+            let sisaJam2_0 = Math.max(0, jamLemburKerja - jamPertama1_5);
+
+            totalLemburKerja = (jamPertama1_5 * 1.5 * upahPerJam) + (sisaJam2_0 * 2 * upahPerJam);
+        }
+
+        let totalLemburLibur = 0;
+        if (jamLemburLibur > 0) {
+            let hLibur = hariLemburLibur > 0 ? hariLemburLibur : 1;
+            let totalJamLiburMaks8 = Math.min(jamLemburLibur, 8 * hLibur);
+            let totalJamLiburLebih = Math.max(0, jamLemburLibur - totalJamLiburMaks8);
+            
+            totalLemburLibur = (totalJamLiburMaks8 * 2 * upahPerJam) + (totalJamLiburLebih * 3 * upahPerJam);
+        }
+
+        let totalLembur = totalLemburKerja + totalLemburLibur;
+        let totalBruto = gajiPokok + totalLembur + insentifTambahan;
+
+        let totalBpjs = totalBruto * bpjsRate;
+        let pph21 = totalBruto * pajakRate;
+
+        globalNetto = totalBruto - totalBpjs - pph21 - potonganTambahan;
+
+        document.getElementById('resUpahJam').innerText = 'Rp ' + formatRupiahText(Math.round(upahPerJam));
+        document.getElementById('resLembur').innerText = 'Rp ' + formatRupiahText(Math.round(totalLembur));
+        document.getElementById('resInsentif').innerText = 'Rp ' + formatRupiahText(Math.round(insentifTambahan));
+        document.getElementById('resTotalBpjs').innerText = '- Rp ' + formatRupiahText(Math.round(totalBpjs));
+        document.getElementById('resPajak').innerText = '- Rp ' + formatRupiahText(Math.round(pph21));
+        document.getElementById('resPotonganLain').innerText = '- Rp ' + formatRupiahText(Math.round(potonganTambahan));
+        document.getElementById('resNetto').innerText = 'Rp ' + formatRupiahText(Math.round(globalNetto));
+
+        document.getElementById('hasil').style.display = 'block';
+    }
+
+    function resetForm() {
+        document.getElementById('gajiPokok').value = '';
+        document.getElementById('hariLemburKerja').value = '';
+        document.getElementById('jamLemburKerja').value = '';
+        document.getElementById('hariLemburLibur').value = '';
+        document.getElementById('jamLemburLibur').value = '';
+        document.getElementById('insentifTambahan').value = '';
+        document.getElementById('potonganTambahan').value = '';
+        document.getElementById('gajiAsliSlip').value = '';
+        document.getElementById('compareResultContainer').innerHTML = '';
+        document.getElementById('hasil').style.display = 'none';
+        globalNetto = 0;
+    }
+
+    // --- FITUR LOCAL STORAGE UNTUK SPLIT BILL (PATUNGAN) ---
+    function generateParticipantInputs(isRestoring = false) {
+        let totalPerson = parseInt(document.getElementById('totalPerson').value) || 0;
+        let container = document.getElementById('participantContainer');
+        if(!isRestoring) container.innerHTML = '';
+
+        if(totalPerson > 15) totalPerson = 15;
+
+        let savedParticipants = JSON.parse(localStorage.getItem('shiftly_split_participants') || '[]');
+
+        if(!isRestoring) {
+            container.innerHTML = '';
+            for(let i = 1; i <= totalPerson; i++) {
+                let defaultName = `Teman ${i}`;
+                let row = document.createElement('div');
+                row.className = 'participant-row';
+                row.innerHTML = `
+                    <input type="checkbox" id="check_${i}" onchange="saveSplitParticipantsState()">
+                    <input type="text" id="name_${i}" value="${defaultName}" style="flex:1;" oninput="saveSplitParticipantsState()">
+                `;
+                container.appendChild(row);
+            }
+            saveSplitParticipantsState();
+        }
+    }
+
+    function saveSplitParticipantsState() {
+        let totalPerson = parseInt(document.getElementById('totalPerson').value) || 0;
+        let participantsData = [];
+
+        for(let i = 1; i <= totalPerson; i++) {
+            let chk = document.getElementById(`check_${i}`);
+            let nameInput = document.getElementById(`name_${i}`);
+            if(chk && nameInput) {
+                participantsData.push({
+                    name: nameInput.value,
+                    checked: chk.checked
+                });
+            }
+        }
+        localStorage.setItem('shiftly_split_participants', JSON.stringify(participantsData));
+        localStorage.setItem('shiftly_split_persons_count', totalPerson);
+        updateSplitTemplateMessage();
+    }
+
+    function muatDataPatunganStorage() {
+        let savedCount = localStorage.getItem('shiftly_split_persons_count');
+        let savedParticipants = JSON.parse(localStorage.getItem('shiftly_split_participants') || '[]');
+        let grandTotalSaved = localStorage.getItem('shiftly_split_grandtotal');
+        let perPersonSaved = localStorage.getItem('shiftly_split_perperson');
+
+        if(savedCount && savedParticipants.length > 0) {
+            document.getElementById('totalPerson').value = savedCount;
+            let container = document.getElementById('participantContainer');
+            container.innerHTML = '';
+
+            savedParticipants.forEach((p, idx) => {
+                let i = idx + 1;
+                let row = document.createElement('div');
+                row.className = 'participant-row';
+                row.innerHTML = `
+                    <input type="checkbox" id="check_${i}" ${p.checked ? 'checked' : ''} onchange="saveSplitParticipantsState()">
+                    <input type="text" id="name_${i}" value="${p.name}" style="flex:1;" oninput="saveSplitParticipantsState()">
+                `;
+                container.appendChild(row);
+            });
+
+            if(grandTotalSaved && perPersonSaved) {
+                globalPerPersonShare = parseFloat(perPersonSaved);
+                document.getElementById('resSplitGrandTotal').innerText = 'Rp ' + formatRupiahText(Math.round(parseFloat(grandTotalSaved)));
+                document.getElementById('resSharePerPerson').innerText = 'Rp ' + formatRupiahText(Math.round(globalPerPersonShare));
+                document.getElementById('hasilPatungan').style.display = 'block';
+                updateSplitTemplateMessage();
+            }
+        }
+    }
+
+    function resetSplitStorage() {
+        if(confirm(currentLang === 'id' ? "Reset semua data patungan dan daftar peserta?" : "Reset all split bill data and participants?")) {
+            localStorage.removeItem('shiftly_split_participants');
+            localStorage.removeItem('shiftly_split_persons_count');
+            localStorage.removeItem('shiftly_split_grandtotal');
+            localStorage.removeItem('shiftly_split_perperson');
+            document.getElementById('totalBill').value = '';
+            document.getElementById('totalPerson').value = '';
+            document.getElementById('participantContainer').innerHTML = '';
+            document.getElementById('hasilPatungan').style.display = 'none';
+        }
+    }
+
+    let globalPerPersonShare = 0;
+
+    function hitungPatungan() {
+        let billEl = document.getElementById('totalBill');
+        let personEl = document.getElementById('totalPerson');
+        
+        let billVal = billEl.value.trim();
+        let personVal = personEl.value.trim();
+
+        if(billVal === "" || personVal === "") {
+            if(billVal === "") billEl.classList.add('error-input');
+            if(personVal === "") personEl.classList.add('error-input');
+            alert(currentLang === 'id' ? "⚠️ Perhatian: Mohon isi total subtotal tagihan dan jumlah orang." : "⚠️ Warning: Please fill in total bill and number of persons.");
+            return;
+        }
+        billEl.classList.remove('error-input');
+        personEl.classList.remove('error-input');
+
+        let subtotalTagihan = parseRupiah(billVal);
+        let taxRate = parseFloat(document.getElementById('splitTaxCategory').value) || 0;
+        let jumlahOrang = parseInt(personVal) || 1;
+
+        let totalPajak = subtotalTagihan * (taxRate / 100);
+        let grandTotal = subtotalTagihan + totalPajak;
+        globalPerPersonShare = grandTotal / jumlahOrang;
+
+        localStorage.setItem('shiftly_split_grandtotal', grandTotal);
+        localStorage.setItem('shiftly_split_perperson', globalPerPersonShare);
+
+        document.getElementById('resSplitGrandTotal').innerText = 'Rp ' + formatRupiahText(Math.round(grandTotal));
+        document.getElementById('resSharePerPerson').innerText = 'Rp ' + formatRupiahText(Math.round(globalPerPersonShare));
+        
+        if(document.getElementById('participantContainer').children.length === 0) {
+            generateParticipantInputs(false);
+        } else {
+            saveSplitParticipantsState();
+        }
+
+        document.getElementById('hasilPatungan').style.display = 'block';
+    }
+
+    function updateSplitTemplateMessage() {
+        let totalPerson = parseInt(document.getElementById('totalPerson').value) || 0;
+        let formattedShare = 'Rp ' + formatRupiahText(Math.round(globalPerPersonShare));
+        let templateText = `Hai temen-temen! ✨\nTotal patungan kita per orang jadi sebesar ${formattedShare} ya.\n\nBisa tolong transfer ke rekeningku/e-wallet ya bagi yang belum. Terima kasih banyak! 🙏`;
+        
+        let templateBox = document.getElementById('splitTemplateMessage');
+        if(templateBox) templateBox.value = templateText;
+    }
+
+    function copySplitTemplate() {
+        let textToCopy = document.getElementById('splitTemplateMessage').value;
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            alert(currentLang === 'id' ? "Template pesan berhasil disalin!" : "Template message copied successfully!");
+        });
+    }
+
+    // --- REVISI: TARGET LEMBUR DENGAN MAKSIMAL JAM LEMBUR 1 HARI ---
+    function hitungTargetLembur() {
+        let gapokEl = document.getElementById('targetGapok');
+        let nominalEl = document.getElementById('targetNominal');
+        let maksJamEl = document.getElementById('targetMaksJam');
+
+        let gapokVal = gapokEl.value.trim();
+        let nominalVal = nominalEl.value.trim();
+        let maksJamVal = maksJamEl.value.trim();
+
+        let hasError = false;
+        if(gapokVal === "") { gapokEl.classList.add('error-input'); hasError = true; } else { gapokEl.classList.remove('error-input'); }
+        if(nominalVal === "") { nominalEl.classList.add('error-input'); hasError = true; } else { nominalEl.classList.remove('error-input'); }
+        if(maksJamVal === "") { maksJamEl.classList.add('error-input'); hasError = true; } else { maksJamEl.classList.remove('error-input'); }
+
+        if(hasError) {
+            alert(currentLang === 'id' ? "⚠️ Perhatian: Mohon lengkapi semua kolom target lembur." : "⚠️ Warning: Please fill in all overtime target fields.");
+            return;
+        }
+
+        let gapok = parseRupiah(gapokVal);
+        let targetNominal = parseRupiah(nominalVal);
+        let maksJam1Hari = parseFloat(maksJamVal) || 1;
+
+        let nominalRate = gapok / 173;
+        let rateJam1 = nominalRate * 1.5;
+        let rateJam2Plus = nominalRate * 2.0;
+
+        let nominalMaksLemburHarian = 0;
+        if(maksJam1Hari === 1) {
+            nominalMaksLemburHarian = rateJam1 * 1;
+        } else {
+            nominalMaksLemburHarian = rateJam1 + (rateJam2Plus * (maksJam1Hari - 1));
+        }
+
+        let totalJamDibutuhkan = 0;
+        if(targetNominal <= (rateJam1)) {
+            totalJamDibutuhkan = targetNominal / rateJam1;
+        } else {
+            let sisaNominal = targetNominal - rateJam1;
+            totalJamDibutuhkan = 1 + (sisaNominal / rateJam2Plus);
+        }
+
+        let estimasiHariKerja = totalJamDibutuhkan / maksJam1Hari;
+
+        document.getElementById('resTargetUpahJam').innerText = 'Rp ' + formatRupiahText(Math.round(nominalRate));
+        document.getElementById('resTargetRate1').innerText = 'Rp ' + formatRupiahText(Math.round(rateJam1));
+        document.getElementById('resTargetRate2').innerText = 'Rp ' + formatRupiahText(Math.round(rateJam2Plus));
+        document.getElementById('resTargetMaksHarian').innerText = 'Rp ' + formatRupiahText(Math.round(nominalMaksLemburHarian));
+        document.getElementById('resTargetTotalJam').innerText = totalJamDibutuhkan.toFixed(1) + ' Jam';
+        document.getElementById('resTargetHariDibutuhkan').innerText = Math.ceil(estimasiHariKerja) + ' Hari Kerja (± ' + totalJamDibutuhkan.toFixed(1) + ' jam total)';
+
+        document.getElementById('hasilTarget').style.display = 'block';
+    }
+
+    function bandingkanSlip() {
+        let slipEl = document.getElementById('gajiAsliSlip');
+        let rawSlip = slipEl.value.trim();
+
+        if (rawSlip === "") {
+            slipEl.classList.add('error-input');
+            alert(currentLang === 'id' ? "⚠️ Perhatian: Kolom slip gaji masih kosong!" : "⚠️ Warning: Payslip field is empty!");
+            return;
+        }
+        slipEl.classList.remove('error-input');
+
+        let slipAsli = parseRupiah(rawSlip);
+        let container = document.getElementById('compareResultContainer');
+
+        if(globalNetto === 0) {
+            alert(currentLang === 'id' ? "Silakan hitung gaji Anda terlebih dahulu!" : "Please calculate your salary first!");
+            return;
+        }
+
+        let selisih = slipAsli - globalNetto;
+        let textSelisih = formatRupiahText(Math.abs(Math.round(selisih)));
+
+        if(Math.abs(selisih) < 1000) {
+            container.innerHTML = `<div class="compare-result match"><i class="fa-solid fa-circle-check"></i> ${currentLang === 'id' ? 'Sempurna! Hasil hitung cocok.' : 'Perfect! Calculation matches.'}</div>`;
+        } else if(selisih > 0) {
+            container.innerHTML = `<div class="compare-result match"><i class="fa-solid fa-circle-info"></i> ${currentLang === 'id' ? 'Slip lebih tinggi Rp ' + textSelisih : 'Payslip is higher by Rp ' + textSelisih}</div>`;
+        } else {
+            container.innerHTML = `<div class="compare-result diff"><i class="fa-solid fa-triangle-exclamation"></i> ${currentLang === 'id' ? 'Slip lebih rendah Rp ' + textSelisih : 'Payslip is lower by Rp ' + textSelisih}</div>`;
+        }
+    }
+
+    let calcValue = "0";
+    function calcAppend(val) {
+        if(calcValue === "0" && !['+', '-', '*', '/'].includes(val)) {
+            calcValue = val;
+        } else {
+            calcValue += val;
+        }
+        document.getElementById('calcDisplay').value = calcValue;
+    }
+
+    function calcClear() {
+        calcValue = "0";
+        document.getElementById('calcDisplay').value = calcValue;
+    }
+
+    function calcBack() {
+        if(calcValue.length > 1) {
+            calcValue = calcValue.slice(0, -1);
+        } else {
+            calcValue = "0";
+        }
+        document.getElementById('calcDisplay').value = calcValue;
+    }
+
+    function calcCompute() {
+        try {
+            let result = eval(calcValue.replace(/×/g, '*').replace(/÷/g, '/'));
+            calcValue = String(Math.round(result * 100) / 100);
+            document.getElementById('calcDisplay').value = calcValue;
+        } catch (e) {
+            document.getElementById('calcDisplay').value = "Error";
+            calcValue = "0";
+        }
+    }
+
+    function simpanTukarShift() {
+        let tgl = document.getElementById('swapDate').value;
+        let rekan = document.getElementById('swapColleague').value.trim();
+        let ket = document.getElementById('swapNote').value.trim();
+
+        if(!tgl || !rekan || !ket) {
+            alert(currentLang === 'id' ? "⚠️ Mohon lengkapi semua data tukar shift!" : "⚠️ Please fill in all shift swap details!");
+            return;
+        }
+
+        let daftarSwap = JSON.parse(localStorage.getItem('shiftly_swaps') || '[]');
+        daftarSwap.push({ id: Date.now(), tgl, rekan, ket });
+        localStorage.setItem('shiftly_swaps', JSON.stringify(daftarSwap));
+
+        document.getElementById('swapDate').value = '';
+        document.getElementById('swapColleague').value = '';
+        document.getElementById('swapNote').value = '';
+
+        muatDaftarShiftSwap();
+        alert(currentLang === 'id' ? "✅ Catatan tukar shift berhasil disimpan!" : "✅ Shift swap note saved successfully!");
+    }
+
+    function muatDaftarShiftSwap() {
+        let container = document.getElementById('swapListContainer');
+        if(!container) return;
+
+        let daftarSwap = JSON.parse(localStorage.getItem('shiftly_swaps') || '[]');
+        if(daftarSwap.length === 0) {
+            container.innerHTML = `<p style="font-size:12px; color: var(--text-muted);">${currentLang === 'id' ? 'Belum ada catatan tukar shift.' : 'No shift swap notes yet.'}</p>`;
+            return;
+        }
+
+        let html = '';
+        daftarSwap.forEach(item => {
+            html += `
+                <div class="swap-item">
+                    <div class="swap-info">
+                        <strong>📅 ${item.tgl}</strong> - ${item.rekan}<br>
+                        <span style="color: var(--text-muted);">${item.ket}</span>
+                    </div>
+                    <button class="btn-delete-swap" onclick="hapusSwap(${item.id})"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    function hapusSwap(id) {
+        let daftarSwap = JSON.parse(localStorage.getItem('shiftly_swaps') || '[]');
+        daftarSwap = daftarSwap.filter(item => item.id !== id);
+        localStorage.setItem('shiftly_swaps', JSON.stringify(daftarSwap));
+        muatDaftarShiftSwap();
+    }
+
+    function shareSummary() {
+        let nettoStr = document.getElementById('resNetto').innerText;
+        let lemburStr = document.getElementById('resLembur').innerText;
+        let textShare = `🚀 Shiftly Monthly Payroll Update for ${currentUserName}:\n💰 Overtime Pay: ${lemburStr}\n💵 Estimated Take Home Pay: ${nettoStr}\n\nTracked securely with Shiftly! ✨`;
+        
+        navigator.clipboard.writeText(textShare).then(() => {
+            alert(currentLang === 'id' ? "Ringkasan berhasil disalin!" : "Summary copied successfully!");
+        });
+    }
+
+    function kirimWhatsApp() {
+        let pesanEl = document.getElementById('pesanSaran');
+        let pesan = pesanEl.value.trim();
+
+        if(!pesan) {
+            pesanEl.classList.add('error-input');
+            alert(currentLang === 'id' ? "⚠️ Perhatian: Mohon tulis pesan Anda!" : "⚠️ Warning: Please type your message!");
+            return;
+        }
+        pesanEl.classList.remove('error-input');
+
+        let encodedMessage = encodeURIComponent(`Hi, here is my feedback/suggestion for Shiftly (from ${currentUserName}):\n\n"${pesan}"`);
+        window.open(`https://wa.me/6282125803211?text=${encodedMessage}`, '_blank');
+    }
+</script>
+
+</body>
+</html>
